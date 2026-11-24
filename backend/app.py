@@ -14,7 +14,7 @@ B = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, static_folder=os.path.join(B, '..', 'frontend'), static_url_path='')
 app.config['MAX_CONTENT_LENGTH'] = 30 * 1024 * 1024
 ser = URLSafeTimedSerializer(os.getenv('SECRET_KEY', 'dev-change-me'))
-MODEL = os.getenv('OPENAI_MODEL', 'gemini-2.5-flash')
+MODEL = os.getenv('OPENAI_MODEL', 'llama-3.3-70b-versatile')
 DATA = os.getenv('DATA_DIR', B); os.makedirs(DATA, exist_ok=True)
 UP = os.path.join(DATA, 'uploads'); os.makedirs(UP, exist_ok=True)
 DB = os.path.join(DATA, 'examgenius.db')
@@ -66,7 +66,7 @@ def auth(f):
 
 def ask(system, user):
     if not os.getenv('OPENAI_API_KEY'): raise RuntimeError('OPENAI_API_KEY is not set on the server')
-    r = OpenAI(base_url="https://generativelanguage.googleapis.com/v1beta/openai/").chat.completions.create(
+    r = OpenAI(base_url="https://api.groq.com/openai/v1").chat.completions.create(
         model=MODEL, response_format={'type': 'json_object'}, temperature=0.3,
         messages=[{'role': 'system', 'content': system}, {'role': 'user', 'content': user}])
     return json.loads(r.choices[0].message.content)
